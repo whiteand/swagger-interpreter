@@ -1,4 +1,5 @@
 const getTypeByRef = require('./getTypeByRef')
+const { PARAMETER_TYPE } = require('./constants')
 const getElementType = function(value, swaggerData) {
   return getTypeOfValue(value.items, swaggerData)
 }
@@ -14,17 +15,17 @@ function getTypeOfValue(value, swaggerData, addRaw = false) {
     }
   }
 
-  if (value.type === 'array') {
+  if (value.type === PARAMETER_TYPE.ARRAY) {
     return {
       ...(addRaw ? { _raw: value } : {}),
-      type: 'array',
+      type: PARAMETER_TYPE.ARRAY,
       elementType: getElementType(value, swaggerData)
     }
   }
-  if (value.type === 'object') {
+  if (value.type === PARAMETER_TYPE.OBJECT) {
     return {
       ...(addRaw ? { _raw: value } : {}),
-      type: 'object',
+      type: PARAMETER_TYPE.OBJECT,
       properties: Object.entries(value.properties).map(([propName, propValue]) => [
         propName,
         getTypeOfValue(propValue, swaggerData)
