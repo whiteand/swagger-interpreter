@@ -1,0 +1,31 @@
+{
+  "name": "swagger-interpretator",
+  "version": "0.0.1",
+  "description": "Code generator for generating api modules from swagger.json",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whiteand/swagger-interpreter.git"
+  },
+  "keywords": [
+    "swagger",
+    "parser",
+    "interpreter",
+    "code",
+    "generator"
+  ],
+  "author": "AndrewBeletskiy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whiteand/swagger-interpreter/issues"
+  },
+  "homepage": "https://github.com/whiteand/swagger-interpreter#readme",
+  "dependencies": {
+    "explained-quartet": "0.0.5",
+    "js-bfs": "^1.0.1",
+    "ramda": "^0.26.1"
+  }
+}
