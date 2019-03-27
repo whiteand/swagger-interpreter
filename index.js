@@ -9,7 +9,9 @@ const getFunctionPart = require('./getFunctionPart')
 const { uniq } = require('ramda')
 
 function temp(swaggerData) {
-  const { paths } = swaggerData
+  // const { paths } = swaggerData
+  // const res = Object.keys(paths)
+  // insplog(res)
   // const allParameters = Object.values(paths)
   //   .map(pathValue => Object.values(pathValue))
   //   .reduce((arr, arr2) => arr.concat(arr2), [])
@@ -55,10 +57,10 @@ async function main(swaggerJsonPath, endpointSearchData, outputFilePath) {
   temp(swaggerData)
   var endpointData = getEndpointData(swaggerData, endpointSearchData)
   if (!endpointData) {
-    console.log('There is no such endpoint :(')
+    console.log('There is no such endpoint((: \'' + endpointSearchData + '\'')
+    console.log('\n\n\n')
     return
   }
-  insplog(endpointData)
   const importsPart = getImportsPart(endpointData)
   const typesPart = getTypesDefinitionPart(endpointData)
   const validatorsPart = getValidatorsPart(endpointData)
@@ -73,5 +75,23 @@ async function main(swaggerJsonPath, endpointSearchData, outputFilePath) {
   var error = await writeFile(outputFilePath, content)
 }
 
-const [_node,_indexJs, swaggerJsonPath, endpointSearchData, outputFilePath] = process.argv
-main(swaggerJsonPath, endpointSearchData, outputFilePath)
+// const [_node,_indexJs, swaggerJsonPath, endpointSearchData, outputFilePath] = process.argv
+// main(swaggerJsonPath, endpointSearchData, outputFilePath)
+
+const { paths } = require('./swagger.json')
+const endpoints = Object.entries(paths).map(([p, endpoints]) => Object.keys(endpoints).map(key => `${p} ${key}`)).reduce((arr, arr2) => arr.concat(arr2), [])
+async function test(endpoints) {
+  for (let ep of endpoints) {
+    try {
+      const [path, method] = ep.split(' ')
+      const outputFilePath = `./../swagger-test/`+`${path.replace(/[\{\}\/]/g, '-').slice(1)}_${method.toUpperCase()}.js`.slice(-100)
+      await main('./swagger.json', ep, outputFilePath)
+    } catch (error) {
+      console.log(`\n\n\nERROR IN ${ep}:\n\n`)
+      console.error(error)
+      console.log(`END`)
+    }
+  }
+}
+test(endpoints)
+

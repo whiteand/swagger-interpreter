@@ -8,7 +8,7 @@ module.exports = function getParameters(rawParameters, swaggerData) {
     return {
       name,
       type,
-      location,
+      location
     };
   });
 };

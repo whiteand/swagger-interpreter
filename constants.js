@@ -10,7 +10,8 @@ const PARAMETER_TYPE = {
   STRING: 'string',
   ARRAY: 'array',
   INTEGER: 'integer',
-  FILE: 'file'
+  FILE: 'file',
+  OBJECT: 'object'
 }
 
 module.exports = {
