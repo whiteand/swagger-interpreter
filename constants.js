@@ -16,5 +16,6 @@ const PARAMETER_TYPE = {
 
 module.exports = {
   PARAMETER_LOCATION,
-  PARAMETER_TYPE
+  PARAMETER_TYPE,
+  TAB_SIZE: 2
 }
