@@ -1,5 +1,11 @@
-module.exports = (endpointData, swaggerData) => {
+module.exports = endpointData => {
+  const name = endpointData.apiModuleName
+  const parametersPart = 'payload'
+  const body = `// TODO: write this`
   return `
-    // FUNCTION PART-------------------------------------------------
+// FUNCTION PART-------------------------------------------------
+export async function ${name}(${parametersPart}) {
+  ${body}
+}
   `.trim()
 }

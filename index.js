@@ -41,7 +41,7 @@ function temp(swaggerData) {
 
 }
 
-async function main(swaggerJsonPath, endpointSearchData, outputFilePath) {
+async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath = './output.js', apiModuleName = 'doRequest') {
   var [json, error] = await readFile(swaggerJsonPath)
   if (error !== null) {
     console.log(`Something went wrong with reading of the file "${swaggerJsonPath}"`)
@@ -54,13 +54,17 @@ async function main(swaggerJsonPath, endpointSearchData, outputFilePath) {
     console.error(error)
     return
   }
-  temp(swaggerData)
   var endpointData = getEndpointData(swaggerData, endpointSearchData)
   if (!endpointData) {
     console.log('There is no such endpoint((: \'' + endpointSearchData + '\'')
     console.log('\n\n\n')
     return
   }
+  endpointData.apiModuleName = apiModuleName
+  endpointData.funcTypeName = apiModuleName.slice(0, 1).toUpperCase() + apiModuleName.slice(1)
+  endpointData.payloadTypeName = endpointData.funcTypeName + 'Payload'
+  endpointData.responseTypeName = endpointData.funcTypeName + 'Response'
+  
   const importsPart = getImportsPart(endpointData)
   const typesPart = getTypesDefinitionPart(endpointData)
   const validatorsPart = getValidatorsPart(endpointData)
@@ -75,8 +79,8 @@ async function main(swaggerJsonPath, endpointSearchData, outputFilePath) {
   var error = await writeFile(outputFilePath, content)
 }
 
-// const [_node,_indexJs, swaggerJsonPath, endpointSearchData, outputFilePath] = process.argv
-// main(swaggerJsonPath, endpointSearchData, outputFilePath)
+// const [_node,_indexJs, swaggerJsonPath, endpointSearchData, outputFilePath, apiModuleName] = 
+// main([...process.argv].slice(2))
 
 const { paths } = require('./swagger.json')
 const endpoints = Object.entries(paths).map(([p, endpoints]) => Object.keys(endpoints).map(key => `${p} ${key}`)).reduce((arr, arr2) => arr.concat(arr2), [])
@@ -84,8 +88,17 @@ async function test(endpoints) {
   for (let ep of endpoints) {
     try {
       const [path, method] = ep.split(' ')
-      const outputFilePath = `./../swagger-test/`+`${path.replace(/[\{\}\/]/g, '-').slice(1)}_${method.toUpperCase()}.js`.slice(-100)
-      await main('./swagger.json', ep, outputFilePath)
+      const outputFilePath = `./../swagger-test/`+`${path.replace(/[\{\}\/]/g, '-').slice(1)}_${method.toUpperCase()}.ts`.slice(-100)
+      const actionName = ((m) => {
+        if (m === 'post') {
+          return 'post'
+        }
+        if (m === 'get') {
+          return 'fetch'
+        }
+        return 'doRequest'
+      })(method)
+      await main('./swagger.json', ep, outputFilePath, actionName)
     } catch (error) {
       console.log(`\n\n\nERROR IN ${ep}:\n\n`)
       console.error(error)
