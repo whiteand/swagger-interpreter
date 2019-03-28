@@ -1,12 +1,13 @@
 const { readFile, writeFile, parseJson } = require('./helpers')
+const { v } = require('explained-quartet')
 const insplog = require('./insplog')
 const getEndpointData = require('./getEndpointData')
 const getImportsPart = require('./imports')
 const getTypesDefinitionPart = require('./getTypesDefinitionPart')
 const getValidatorsPart = require('./getValidatorsPart')
 const getFunctionPart = require('./getFunctionPart')
-
-const { uniq } = require('ramda')
+const { bfs } = require('js-bfs')
+const R = require('ramda')
 
 function temp(swaggerData) {
   // const { paths } = swaggerData
@@ -70,21 +71,21 @@ async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath =
   const validatorsPart = getValidatorsPart(endpointData)
   const apiModuleFunctionPart = getFunctionPart(endpointData)
   const content = [
-    importsPart,
+    //importsPart,
     typesPart,
-    validatorsPart,
-    apiModuleFunctionPart
+//    validatorsPart,
+    //apiModuleFunctionPart
   ].join('\n\n')
-
-  var error = await writeFile(outputFilePath, content)
+  console.log(content)
+  // var error = await writeFile(outputFilePath, content)
 }
 
-// const [_node,_indexJs, swaggerJsonPath, endpointSearchData, outputFilePath, apiModuleName] = 
-// main([...process.argv].slice(2))
+main(...([...process.argv].slice(2)))
 
 const { paths } = require('./swagger.json')
 const endpoints = Object.entries(paths).map(([p, endpoints]) => Object.keys(endpoints).map(key => `${p} ${key}`)).reduce((arr, arr2) => arr.concat(arr2), [])
 async function test(endpoints) {
+  const endpointsData = []
   for (let ep of endpoints) {
     try {
       const [path, method] = ep.split(' ')
@@ -98,13 +99,66 @@ async function test(endpoints) {
         }
         return 'doRequest'
       })(method)
-      await main('./swagger.json', ep, outputFilePath, actionName)
+      const endpointData = await main('./swagger.json', ep, outputFilePath, actionName)
+      endpointsData.push(endpointData)
     } catch (error) {
       console.log(`\n\n\nERROR IN ${ep}:\n\n`)
       console.error(error)
       console.log(`END`)
     }
   }
+  // const res = []
+  // bfs(endpointsData, (node, nodePath) => {
+  //   if (!node) return
+  //   if (!node.type) return
+  //   if (nodePath[nodePath.length-2] === 'parameters') return
+  //   if (nodePath[nodePath.length-1] === 'properties') return
+  //   res.push(R.omit(['description'], node))
+  // })
+  // v()
+  
+  // const isValid = v.arrayOf(v.and({
+  //   type: v.enum('string','object', 'integer', 'array', 'number', 'file', 'boolean')
+  // }, checkType))(res)
+  // if (!isValid) {
+  //   insplog(v.explanation)
+  // }
+  
 }
-test(endpoints)
+
+// const VALIDATOR = {
+//   string: v({
+//     format: ['undefined','string'],
+//   }),
+//   object: v({
+//     format: 'undefined',
+//     properties: v.dictionaryOf(checkType)
+//   }),
+//   integer: v({
+//     format: ['string','undefined']
+//   }),
+//   array: v({
+//     format: 'undefined',
+//     items: [v => Object.keys(v).length === 0, checkType]
+//   }),
+//   number: v({
+//     format: ['string', 'undefined'],
+//   }),
+//   file: v({
+//     format: 'undefined',
+//   }),
+//   boolean: v({
+//     format: 'undefined',
+//   })
+// }
+
+// function checkType(value) {
+//   const isValid = VALIDATOR[value.type]
+//   if (!isValid) {
+//     insplog('WITHOUT TYPE', value)
+//     return true
+//   }
+//   return isValid(value)
+// }
+// test(endpoints)
 

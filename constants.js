@@ -11,7 +11,8 @@ const PARAMETER_TYPE = {
   ARRAY: 'array',
   INTEGER: 'integer',
   FILE: 'file',
-  OBJECT: 'object'
+  OBJECT: 'object',
+  NUMBER: 'number'
 }
 
 module.exports = {

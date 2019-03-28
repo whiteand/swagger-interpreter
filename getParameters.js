@@ -1,14 +1,14 @@
-const getTypeOfValue = require("./getTypeOfValue");
+const { replaceInnerRefsWithDefinitions, mergeSchemaToType } = require('./typeHelpers')
 
 module.exports = function getParameters(rawParameters, swaggerData) {
   // TODO: write this
   return rawParameters.map(param => {
-    const type = getTypeOfValue(param, swaggerData);
-    const { name, in: location } = param;
+    const { name, in: location, required, ...type } = param;
     return {
       name,
-      type,
-      location
+      type: mergeSchemaToType(replaceInnerRefsWithDefinitions(type, swaggerData)),
+      location,
+      required,
     };
   });
 };
