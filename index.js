@@ -10,6 +10,7 @@ const { bfs } = require('js-bfs')
 const R = require('ramda')
 
 
+
 async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath = './output.js', apiModuleName = 'doRequest') {
   var [json, error] = await readFile(swaggerJsonPath)
   if (error !== null) {
@@ -31,27 +32,32 @@ async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath =
   }
   endpointData.apiModuleName = apiModuleName
   endpointData.funcTypeName = apiModuleName.slice(0, 1).toUpperCase() + apiModuleName.slice(1)
-  endpointData.payloadTypeName = endpointData.funcTypeName + 'Payload'
-  endpointData.responseTypeName = endpointData.funcTypeName + 'Response'
+  endpointData.hasResponse = Boolean(endpointData.response.type)
+  endpointData.hasPayload = endpointData.parameters.length > 0
+  endpointData.payloadTypeName = endpointData.hasPayload ? endpointData.funcTypeName + 'Payload' : 'any'
+  endpointData.responseTypeName = endpointData.hasResponse ? endpointData.funcTypeName + 'Response' : 'void'
   
   const importsPart = getImportsPart(endpointData)
   const typesPart = getTypesDefinitionPart(endpointData)
   const validatorsPart = getValidatorsPart(endpointData)
   const apiModuleFunctionPart = getFunctionPart(endpointData)
   const content = [
-    //importsPart,
+    importsPart,
     typesPart,
-    //validatorsPart,
+    validatorsPart,
     apiModuleFunctionPart
   ].join('\n\n')
-  console.log(content)
-  // var error = await writeFile(outputFilePath, content)
+  // console.log(content)
+  var error = await writeFile(outputFilePath, content)
+  if (error) {
+    console.error(error)
+  }
 }
 
 main(...([...process.argv].slice(2)))
 
 const { paths } = require('./swagger.json')
-const endpoints = Object.entries(paths).map(([p, endpoints]) => Object.keys(endpoints).map(key => `${p} ${key}`)).reduce((arr, arr2) => arr.concat(arr2), [])
+const endpoints = Object.entries(paths).map(([p, endpoints]) => Object.keys(endpoints).map(key => `${p} ${key}`)).reduce((arr, arr2) => arr.concat(arr2), []).sort(() => Math.random() - 0.5)
 async function test(endpoints) {
   const endpointsData = []
   for (let ep of endpoints) {
@@ -73,6 +79,7 @@ async function test(endpoints) {
       console.log(`\n\n\nERROR IN ${ep}:\n\n`)
       console.error(error)
       console.log(`END`)
+      return
     }
   }
   // const res = []
@@ -128,5 +135,5 @@ async function test(endpoints) {
 //   }
 //   return isValid(value)
 // }
-// test(endpoints)
+ test(endpoints)
 

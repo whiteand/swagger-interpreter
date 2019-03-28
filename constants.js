@@ -14,9 +14,11 @@ const PARAMETER_TYPE = {
   OBJECT: 'object',
   NUMBER: 'number'
 }
-
+const url = '/api/backoffice/matchings'
+const method = 'get'
 module.exports = {
   PARAMETER_LOCATION,
   PARAMETER_TYPE,
-  TAB_SIZE: 2
+  TAB_SIZE: 2,
+  endpointSearchData: `${url} ${method}`
 }

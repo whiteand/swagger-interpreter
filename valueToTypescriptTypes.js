@@ -82,7 +82,7 @@ function valueToTypescriptTypes(value, typeName) {
 
 function enumToTypescriptDefinition(value, typeName) {
   const { enum: enumValues } = value
-  const body = enumValues.map(value => `${value} = ${JSON.stringify(value)}`).join('\n')
+  const body = enumValues.map(value => `${value} = ${JSON.stringify(value)}`).join(',\n')
   return {
     typeName,
     type: getType(value),

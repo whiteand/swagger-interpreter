@@ -1,74 +1,104 @@
 const tab = require("./tab");
 const insplog = require("./insplog");
+const R = require('ramda')
 const { PARAMETER_LOCATION } = require("./constants");
 
-const doRequestDict = {
-  getheaders: ({ parameters, hasResponse }) => {
-    const headerParamsNames = parameters
-      .filter(p => p.location === PARAMETER_LOCATION.HEADER)
-      .map(e => e.name);
-    let res = [
-      `const { ${headerParamsNames.join(", ")} } = payload`,
-      (hasResponse ? "const response = " : "") +
-        `await axios.get(URL, { headers: { ${headerParamsNames.join(", ")} } })`
-    ].join("\n");
-    return res;
-  },
-  patchheaders: ({ parameters, hasResponse }) => {
-    const headerParamsNames = parameters
-      .filter(p => p.location === PARAMETER_LOCATION.HEADER)
-      .map(e => e.name);
-    let res = [
-      `const { ${headerParamsNames.join(", ")} } = payload`,
-      (hasResponse ? "const response = " : "") +
-        `await axios.patch(URL, null, { headers: { ${headerParamsNames.join(", ")} } })`
-    ].join("\n");
-    return res;
-  }
-};
+const axiosRequestGenerator = (method, params, hasResponse) => {
+  let res = (hasResponse ? 'const response = ' : '') + 'await axios.' + method.toLowerCase()
+  isSoLong = params.join(', ').length > 40
+  res = isSoLong
+    ? `${res}(\n${tab(params.join(',\n'))}\n)`
+    : `${res}(${params.join(', ')})`
 
-const doRequestPart = (data, hasPayload, hasResponse) => {
-  const isDynamicUrl = data.parameters.some(
+  return res
+}
+
+const getAxiosParams = (method, parameters) => {
+  let res = ['URL', null, null]
+  const configIndex = ['post', 'put', 'patch'].includes(method) ? 2 : 1
+  const headersLens = R.lensPath([configIndex, 'headers'])
+  const queryLens = R.lensPath([configIndex, 'query'])
+  const bodyLens = R.lensPath(['post', 'put', 'patch'].includes(method) ? [1] : [1, 'data'])
+
+  for (let p of parameters) {
+    if (p.location === PARAMETER_LOCATION.PATH) continue
+    if (p.location === PARAMETER_LOCATION.FORM_DATA) continue
+    if (p.location === PARAMETER_LOCATION.BODY) {
+      res = R.over(bodyLens, R.ifElse(Boolean, R.append(p.name), R.always([p.name])), res)
+    }
+    if (p.location === PARAMETER_LOCATION.QUERY) {
+      res = R.over(queryLens, R.ifElse(Boolean, R.append(p.name), R.always([p.name])), res)
+    }
+    if (p.location === PARAMETER_LOCATION.HEADER) {
+      res = R.over(headersLens, R.ifElse(Boolean, R.append(p.name), R.always([p.name])), res)
+    }
+  }
+
+  if (parameters.some(p => p.location === PARAMETER_LOCATION.FORM_DATA)) {
+    res[1] = 'formData'
+  }
+
+
+  while (res[res.length-1] === null) {
+    res.splice(-1, 1)
+  }
+
+  const transformToString = value => {
+    if(typeof value === 'string') return value
+    if (value === null) return 'null'
+    const json = JSON.stringify(value)
+    return json
+      .replace(/\[/g, '{')
+      .replace(/\]/g, '}')
+      .replace(/"/g, '')
+      .replace(/\{/g, '{ ')
+      .replace(/\}/g, ' }')
+      .replace(/:\{/g, ': {')
+      .replace(/,/g, ', ')
+
+
+  }
+
+  const stringRes = res.map(transformToString)
+  return stringRes
+}
+
+const getUrlPart = (parameters, url) => {
+  const isDynamicUrl = parameters.some(
     p => p.location === PARAMETER_LOCATION.PATH
   );
   const insertValuesIntoUrl = str =>
     "`" + str.replace(/{/g, "${payload.") + "`";
-  const urlPart = isDynamicUrl
-    ? `const URL = ${insertValuesIntoUrl(data.path)}`
-    : JSON.stringify(data.path);
+  const urlPart =
+    "const URL = " +
+    (isDynamicUrl ? insertValuesIntoUrl(url) : JSON.stringify(url));
+    return urlPart
+}
+
+const getDestructuring = parameters => {
+  const parametersNames = parameters
+    .filter(p => p.location !== PARAMETER_LOCATION.PATH)
+    .map(p => p.name)
+  
+  const isSoLong = parametersNames.length > 40
+
+  const result = isSoLong
+    ? `const {\n${tab(parametersNames.join(',\n'))}\n} = payload`
+    : `const { ${parametersNames.join(', ')} } = payload`
+  return result 
+}
+
+
+const doRequestPart = (data, hasPayload, hasResponse) => {
   const axiosMethod = data.method.toLowerCase();
-  const headerParams = data.parameters.filter(
-    p => p.location === PARAMETER_LOCATION.HEADER
-  );
-  const queryParams = data.parameters.filter(
-    p => p.location === PARAMETER_LOCATION.QUERY
-  );
-  const bodyParams = data.parameters.filter(
-    p => p.location === PARAMETER_LOCATION.BODY
-  );
-  const formDataParams = data.parameters.filter(
-    p => p.location === PARAMETER_LOCATION.FORM_DATA
-  );
-  const key = `${axiosMethod}${headerParams.length ? "headers" : ""}${
-    queryParams.length ? "query" : ""
-  }${bodyParams.length ? "body" : ""}${
-    formDataParams.length ? "formData" : ""
-  }`;
+  const axiosParameters = getAxiosParams(axiosMethod, data.parameters)
 
-  insplog({ key, hasResponse, hasPayload })
-
-  // TODO: write form Data
-  /**
-   * PATH: 'path',
-   * HEADER: 'header',
-   * QUERY: 'query',
-   * BODY: 'body',
-   * FORM_DATA: 'formData'
-   */
-  return [
-    urlPart,
-    doRequestDict[key]({ ...data, hasPayload, hasResponse })
+  const res = [
+    getUrlPart(data.parameters, data.path),
+    getDestructuring(data.parameters),
+    axiosRequestGenerator(axiosMethod, axiosParameters, hasResponse)
   ].join("\n");
+  return res
 };
 
 const deserializePart = data => {
@@ -91,11 +121,13 @@ if (!checkPayload(${variableName})) {
       ? getValidationPart("payload", `Wrong ${data.apiModuleName} payload`)
       : "",
     doRequestPart(data, hasPayload, hasResponse), // transforms payload to right axios request
-    ...(hasResponse ? [
-      getValidationPart("response", `Wrong ${data.apiModuleName} payload`),
-      deserializePart(data), // transforms response and saves into result
-      `return result as ${data.responseTypeName}`
-    ] : [])
+    ...(hasResponse
+      ? [
+          getValidationPart("response", `Wrong ${data.apiModuleName} payload`),
+          deserializePart(data), // transforms response and saves into result
+          `return result as ${data.responseTypeName}`
+        ]
+      : [])
   ].join("\n\n");
 }
 module.exports = endpointData => {
