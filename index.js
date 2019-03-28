@@ -9,38 +9,6 @@ const getFunctionPart = require('./getFunctionPart')
 const { bfs } = require('js-bfs')
 const R = require('ramda')
 
-function temp(swaggerData) {
-  // const { paths } = swaggerData
-  // const res = Object.keys(paths)
-  // insplog(res)
-  // const allParameters = Object.values(paths)
-  //   .map(pathValue => Object.values(pathValue))
-  //   .reduce((arr, arr2) => arr.concat(arr2), [])
-  //   .map(endpointValue => endpointValue.parameters)
-  //   .reduce((arr, arr2) => arr.concat(arr2), [])
-  // const allParametersPropsEntries = allParameters
-  //   .map(e => Object.entries(e))
-  //   .reduce((arr, arr2) => arr.concat(arr2), [])
-  // const allProps = [...allParametersPropsEntries
-  //   .map(e => e[0])
-  //   .reduce((set, el) => set.add(el), new Set())
-  // ]
-  // const allPropsValuesDict = allProps
-  //   .map(propName => ({
-  //     valuesSet: allParameters.map(param => param[propName])
-  //       .reduce((set, value) => set.add(value), new Set()),
-  //     propName,
-  //   }))
-  //   .reduce((dict, { propName, valuesSet }) => ({ ...dict, [propName]: uniq([...valuesSet]) }), {})
-  // insplog(allPropsValuesDict)
-  // const allPaths = Object.values(paths)
-  //   .map(pathValue => Object.values(pathValue))
-  //   .reduce((arr, arr2) => arr.concat(arr2), [])
-  //   .map(e => e.responses)
-  //   .map(e => e[200])
-  // insplog(allPaths)
-
-}
 
 async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath = './output.js', apiModuleName = 'doRequest') {
   var [json, error] = await readFile(swaggerJsonPath)
@@ -73,8 +41,8 @@ async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath =
   const content = [
     //importsPart,
     typesPart,
-//    validatorsPart,
-    //apiModuleFunctionPart
+    //validatorsPart,
+    apiModuleFunctionPart
   ].join('\n\n')
   console.log(content)
   // var error = await writeFile(outputFilePath, content)

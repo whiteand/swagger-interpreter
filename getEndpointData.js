@@ -71,7 +71,10 @@ module.exports = (swaggerData, searchData) => {
 
   const { paths } = swaggerData;
 
-  const pathEntry = Object.entries(paths).find(([path, value]) =>
+  let pathEntry = Object.entries(paths).find(([path, value]) =>
+    path === searchPath && Object.keys(value).includes(searchMethod.toLowerCase())
+  );
+  pathEntry = pathEntry || Object.entries(paths).find(([path, value]) =>
     path.includes(searchPath) && Object.keys(value).includes(searchMethod.toLowerCase())
   );
   if (!pathEntry) { 

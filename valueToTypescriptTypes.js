@@ -108,7 +108,13 @@ function objectToTypescriptDefinition(value, typeName) {
       outerTypes: []
     }
   }
-  const getPropTypeName = propName => `${typeName}${_.upperFirst(propName)}`
+  const getPropTypeName = propName => {
+    const propValue = value.properties[propName]
+    if (propValue.enum) {
+      return _.upperFirst(propName)
+    }
+    return `${typeName}${_.upperFirst(propName)}`
+  }
 
   const propsTypes = Object.entries(value.properties).map(([propName, propValue]) => [
     propName,
