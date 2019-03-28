@@ -135,5 +135,5 @@ async function test(endpoints) {
 //   }
 //   return isValid(value)
 // }
- test(endpoints)
+// test(endpoints)
 
