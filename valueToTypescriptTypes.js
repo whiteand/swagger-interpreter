@@ -8,6 +8,7 @@ const isObject = value => PARAMETER_TYPE.OBJECT === value.type
 const isEnum = value => value.type === PARAMETER_TYPE.STRING && value.enum
 const _ = require('lodash')
 const R = require('ramda')
+const insplog = require('./insplog')
 
 /**
  * 
@@ -57,11 +58,41 @@ function valueToTypescriptTypes(value, typeName) {
     return arrayToTypescriptDefinition(value, typeName)
   }
 
+  if (type === 'enum') {
+    return enumToTypescriptDefinition(value, typeName)
+  }
+
+  if (type === 'string') {
+    return {
+      typeName,
+      type: 'string',
+      innerUsage: 'string | null',
+      declaration: 'type BackendString = string | null'
+    }
+  }
+
   return {
     typeName,
     type,
     declaration: `type ${typeName} = ${type}`,
     innerUsage: type,
+    outerTypes: []
+  }
+}
+
+function enumToTypescriptDefinition(value, typeName) {
+  const { enum: enumValues } = value
+  const body = enumValues.map(value => `${value} = ${JSON.stringify(value)}`).join('\n')
+  return {
+    typeName,
+    type: getType(value),
+    declaration: `
+enum ${typeName} {
+${tab(body, 1)}
+}
+
+`.trim(),
+    innerUsage: `${typeName}[]`,
     outerTypes: []
   }
 }

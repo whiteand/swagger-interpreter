@@ -1,5 +1,6 @@
 const { PARAMETER_TYPE } = require('./constants')
 const insplog = require('./insplog')
+const R = require('ramda')
 const { bfs } = require('js-bfs')
 const valueToTypescriptTypes = require('./valueToTypescriptTypes')
 
@@ -24,7 +25,7 @@ const payloadTypes = endpointData => {
   })
 
   return [
-    ...additionalDeclarations.reverse().map(t => t.declaration),
+    ...R.uniq(additionalDeclarations.reverse().map(t => t.declaration)),
     res.declaration
   ].join('\n\n')
 };
@@ -43,13 +44,9 @@ const responseTypes = endpointData => {
   })
 
   return [
-    ...additionalDeclarations.reverse().map(t => t.declaration),
+    ...R.uniq(additionalDeclarations.reverse().map(t => t.declaration)),
     res.declaration
   ].join('\n\n')
-};
-
-const functionDeclaration = ({ funcTypeName, payloadTypeName, responseTypeName }) => {
-  return `type ${funcTypeName} = (payload: ${payloadTypeName}) => Promise<${responseTypeName}>`
 };
 
 module.exports = endpointData => {
