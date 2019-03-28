@@ -66,8 +66,9 @@ function valueToTypescriptTypes(value, typeName) {
     return {
       typeName,
       type: 'string',
-      innerUsage: 'string | null',
-      declaration: 'type BackendString = string | null'
+      innerUsage: '(string | null)',
+      declaration: 'type BackendString = string | null',
+      outerTypes: []
     }
   }
 
@@ -131,6 +132,7 @@ function objectToTypescriptDefinition(value, typeName) {
     }
     return outer
   }, [])
+  insplog(propsTypes.achievements)
   return {
     typeName,
     type: 'object',
@@ -146,6 +148,16 @@ function arrayToTypescriptDefinition(value, typeName) {
     : typeName + 'Item'
 
   const itemType = valueToTypescriptTypes(value.items, itemTypeName)
+  if (!['object','enum','array'].includes(itemType.type)) {
+    const innerUsage = `${itemType.innerUsage}[]`
+    return {
+      typeName,
+      type: 'array',
+      declaration: `type ${typeName} = ${innerUsage}`,
+      innerUsage,
+      outerTypes: []
+    }
+  }
   const innerUsage = `${itemTypeName}[]`
   return {
     typeName,

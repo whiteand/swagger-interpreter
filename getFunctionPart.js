@@ -85,7 +85,6 @@ const getAxiosParams = (method, parameters) => {
   };
 
   const stringRes = res.map(transformToString);
-  insplog(stringRes);
   return stringRes;
 };
 
@@ -136,7 +135,6 @@ const doRequestPart = (data, hasPayload, hasResponse) => {
   const hasFormData = data.parameters.some(
     p => p.location === PARAMETER_LOCATION.FORM_DATA
   );
-  insplog({ axiosParameters, url: data.path, method: data.method });
   const res = [
     getUrlPart(data.parameters, data.path),
     getDestructuring(data.parameters),
