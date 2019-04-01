@@ -13,6 +13,7 @@ const PARAMETER_TYPE = {
   FILE: 'file',
   OBJECT: 'object',
   NUMBER: 'number',
+  BOOLEAN: 'boolean',
 };
 const url = '/api/backoffice/matchings';
 const method = 'get';

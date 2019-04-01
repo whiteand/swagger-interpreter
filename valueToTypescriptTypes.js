@@ -9,8 +9,8 @@ const isString = value => [PARAMETER_TYPE.STRING, PARAMETER_TYPE.FILE].includes(
 const isNumber = value => [PARAMETER_TYPE.NUMBER, PARAMETER_TYPE.INTEGER].includes(value.type);
 const isArray = value => PARAMETER_TYPE.ARRAY === value.type;
 const isObject = value => PARAMETER_TYPE.OBJECT === value.type;
+const isBoolean = value => PARAMETER_TYPE.BOOLEAN === value.type;
 const isEnum = value => value.type === PARAMETER_TYPE.STRING && value.enum;
-
 
 /**
  *
@@ -29,6 +29,10 @@ function getType(value) {
   }
   if (isArray(value)) {
     return 'array';
+  }
+  console.log(value, PARAMETER_TYPE.BOOLEAN);
+  if (isBoolean(value)) {
+    return 'boolean';
   }
   if (isObject(value)) {
     return 'object';
@@ -73,6 +77,17 @@ function valueToTypescriptTypes(value, typeName) {
       type: 'string',
       innerUsage: '(string | null)',
       declaration: 'type BackendString = string | null',
+      outerTypes: [],
+    };
+  }
+  console.log(value, type);
+
+  if (type === 'boolean') {
+    return {
+      typeName,
+      type: 'boolean',
+      innerUsage: 'boolean',
+      declaration: `type ${typeName} = ${type}`,
       outerTypes: [],
     };
   }
@@ -129,7 +144,10 @@ function objectToTypescriptDefinition(value, typeName) {
       propName,
       valueToTypescriptTypes(propValue, getPropTypeName(propName)),
     ])
-    .reduce((obj, [key, typescriptType]) => R.assoc(key, typescriptType, obj), {});
+    .reduce(
+      (obj, [key, typescriptType]) => R.assoc(key, typescriptType, obj),
+      {},
+    );
 
   const propsPart = Object.keys(value.properties)
     .map(e => `${e}: ${propsTypes[e].innerUsage}`)
