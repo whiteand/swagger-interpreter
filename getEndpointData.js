@@ -1,10 +1,9 @@
-const { v } = require('explained-quartet')
-const { PARAMETER_LOCATION, PARAMETER_TYPE } = require('./constants')
-const getParameters = require('./getParameters')
-const getResponse = require('./getResponse')
-const checkSchema = require('./checkSchema')
-const insplog = require('./insplog')
-const R = require('ramda')
+const { v } = require('explained-quartet');
+const { PARAMETER_LOCATION, PARAMETER_TYPE } = require('./constants');
+const getParameters = require('./getParameters');
+const getResponse = require('./getResponse');
+const checkSchema = require('./checkSchema');
+const insplog = require('./insplog');
 
 const checkParameter = swaggerData => v.and(
   {
@@ -18,12 +17,12 @@ const checkParameter = swaggerData => v.and(
         {
           $ref: 'string',
         },
-        checkSchema(swaggerData)
-      )
-    ]
+        checkSchema(swaggerData),
+      ),
+    ],
   },
-  param => param.type || param.schema
-)
+  param => param.type || param.schema,
+);
 const check200Response = swaggerData => v([
   {
     schema: [
@@ -32,36 +31,38 @@ const check200Response = swaggerData => v([
         {
           $ref: 'string',
         },
-        checkSchema(swaggerData)
-      )
-    ]
+        checkSchema(swaggerData),
+      ),
+    ],
   },
   {
-    type: v.enum(...Object.values(PARAMETER_TYPE))
-  }])
+    type: v.enum(...Object.values(PARAMETER_TYPE)),
+  },
+]);
 
 const checkendPointDescription = swaggerData => v({
   parameters: v.arrayOf(checkParameter(swaggerData)),
   responses: {
-    200: check200Response(swaggerData)
-  }
-})
+    200: check200Response(swaggerData),
+  },
+});
 
 const deserialize = (endpointDescription, swaggerData) => {
-  v()
+  v();
   if (!checkendPointDescription(swaggerData)(endpointDescription)) {
-    console.log('Error while parsing endpoint data: ')
-    insplog(v.explanation.join(';\n'))
-    return null
+    // eslint-disable-next-line
+    console.log("Error while parsing endpoint data: ");
+    insplog(v.explanation.join(';\n'));
+    return null;
   }
-  const { path, method } = endpointDescription
+  const { path, method } = endpointDescription;
   return {
     path,
     method,
     parameters: getParameters(endpointDescription.parameters, swaggerData),
-    response: getResponse(endpointDescription.responses['200'], swaggerData)
-  }
-}
+    response: getResponse(endpointDescription.responses['200'], swaggerData),
+  };
+};
 
 module.exports = (swaggerData, searchData) => {
   const [searchPath, searchMethod] = searchData.trim().split(/\s+/);
@@ -71,31 +72,36 @@ module.exports = (swaggerData, searchData) => {
 
   const { paths } = swaggerData;
 
-  let pathEntry = Object.entries(paths).find(([path, value]) =>
-    path === searchPath && Object.keys(value).includes(searchMethod.toLowerCase())
+  let pathEntry = Object.entries(paths).find(
+    ([path, value]) => path === searchPath
+      && Object.keys(value).includes(searchMethod.toLowerCase()),
   );
-  pathEntry = pathEntry || Object.entries(paths).find(([path, value]) =>
-    path.includes(searchPath) && Object.keys(value).includes(searchMethod.toLowerCase())
-  );
-  if (!pathEntry) { 
+  pathEntry = pathEntry
+    || Object.entries(paths).find(
+      ([path, value]) => path.includes(searchPath)
+        && Object.keys(value).includes(searchMethod.toLowerCase()),
+    );
+  if (!pathEntry) {
     return null;
   }
 
   const [path, endpoints] = pathEntry;
-  const endpointEntry = Object.entries(endpoints).find(([method]) =>
-    method.toLowerCase().includes(searchMethod.toLowerCase())
-  );
+  const endpointEntry = Object.entries(endpoints)
+    .find(([method]) => method.toLowerCase().includes(searchMethod.toLowerCase()));
 
   if (!endpointEntry) {
     return null;
   }
 
   const [method, endpointDescription] = endpointEntry;
-  const res = deserialize({
-    ...endpointDescription,
-    path,
-    method
-  }, swaggerData);
+  const res = deserialize(
+    {
+      ...endpointDescription,
+      path,
+      method,
+    },
+    swaggerData,
+  );
   // insplog(res)
-  return res
+  return res;
 };

@@ -1,8 +1,9 @@
-const fs = require("fs");
-const util = require("util");
+const fs = require('fs');
+const util = require('util');
+
 const promisedReadFile = util.promisify(fs.readFile);
 const promisedWriteFile = util.promisify(fs.writeFile);
-const readFile = async path => {
+const readFile = async (path) => {
   try {
     const content = await promisedReadFile(path);
     return [content, null];
@@ -19,7 +20,7 @@ const writeFile = async (path, content) => {
   }
 };
 
-const parseJson = json => {
+const parseJson = (json) => {
   try {
     const content = JSON.parse(json);
     return [content, null];
@@ -31,5 +32,5 @@ const parseJson = json => {
 module.exports = {
   readFile,
   writeFile,
-  parseJson
+  parseJson,
 };
