@@ -54,7 +54,7 @@ const getResponseValidator = (data) => {
 };
 
 const hasEnumCheck = (endpointData) => {
-  if (!endpointData.hasResponse) return false;
+  if (!endpointData.hasResponse && !endpointData.hasPayload) return false;
   let hasEnums = false;
   bfs(endpointData, (node) => {
     if (!node || !node.type || !node.enum) return;
