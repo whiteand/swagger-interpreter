@@ -56,7 +56,7 @@ const getResponseValidator = (data) => {
 const hasEnumCheck = (endpointData) => {
   if (!endpointData.hasResponse) return false;
   let hasEnums = false;
-  bfs(endpointData.response, (node) => {
+  bfs(endpointData, (node) => {
     if (!node || !node.type || !node.enum) return;
     hasEnums = true;
   });
@@ -75,10 +75,10 @@ module.exports = (endpointData) => {
   const { hasResponse, hasPayload } = endpointData;
   if (!hasResponse && !hasPayload) return '';
   const res = [];
-  if (hasPayload) res.push(getPayloadValidator(endpointData));
   if (hasEnumCheck(endpointData)) {
     res.push(getEnumCheckerPart());
   }
+  if (hasPayload) res.push(getPayloadValidator(endpointData));
   if (hasResponse) res.push(getResponseValidator(endpointData));
 
   return res.join('\n\n');
