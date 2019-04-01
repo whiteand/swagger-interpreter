@@ -1,6 +1,6 @@
 {
   "name": "swagger-interpretator",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Code generator for generating api modules from swagger.json",
   "main": "index.js",
   "scripts": {
