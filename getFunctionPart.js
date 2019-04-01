@@ -1,5 +1,6 @@
 const tab = require("./tab");
 const insplog = require("./insplog");
+const { bfs } = require('js-bfs')
 const R = require("ramda");
 const { PARAMETER_LOCATION } = require("./constants");
 const _ = require('lodash')
@@ -146,7 +147,24 @@ const doRequestPart = (data, hasPayload, hasResponse) => {
 };
 
 const deserializePart = data => {
-  return "const result = response// TODO: write this";
+  const listOfEnumPaths = []
+  const getExamplePath = path => '// response' + path.reduce((p, item) => {
+    if (item === 'items') return p + '[]'
+    if (item === 'properties') return p
+    return p + `.${item}`
+  }, '')
+  bfs(data.response, (node, nodePath) => {
+    if (!node || !node.type || !node.enum) return
+    listOfEnumPaths.push(getExamplePath(nodePath))
+  })
+  const comments = `
+// TODO: write deserialization for enum string lists:
+${listOfEnumPaths.join(';\n')}
+  `.trim()
+  return [
+    comments,
+    "const result = response// TODO: write this"
+  ].join('\n');
 };
 
 function getBody(data) {
