@@ -163,7 +163,7 @@ ${listOfEnumPaths.join(';\n')}
   `.trim()
   return [
     comments,
-    "const result = response// TODO: write this"
+    "const result = response"
   ].join('\n');
 };
 
