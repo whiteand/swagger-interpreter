@@ -170,4 +170,7 @@ function arrayToTypescriptDefinition(value, typeName) {
 }
 
 
-module.exports = valueToTypescriptTypes
+module.exports = {
+  valueToTypescriptTypes,
+  getType
+}

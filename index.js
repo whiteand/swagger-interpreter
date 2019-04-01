@@ -47,6 +47,7 @@ async function main(swaggerJsonPath, endpointSearchData=' get', outputFilePath =
     validatorsPart,
     apiModuleFunctionPart
   ].join('\n\n')
+  console.log(content)
   var error = await writeFile(outputFilePath, content)
   if (error) {
     console.error(error)

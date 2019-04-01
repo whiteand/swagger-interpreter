@@ -2,7 +2,7 @@ const { PARAMETER_TYPE } = require('./constants')
 const insplog = require('./insplog')
 const R = require('ramda')
 const { bfs } = require('js-bfs')
-const valueToTypescriptTypes = require('./valueToTypescriptTypes')
+const { valueToTypescriptTypes } = require('./valueToTypescriptTypes')
 
 const payloadTypes = endpointData => {
   if (endpointData.parameters.length === 0) {

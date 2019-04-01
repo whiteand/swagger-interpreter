@@ -2,6 +2,7 @@ const tab = require("./tab");
 const insplog = require("./insplog");
 const R = require("ramda");
 const { PARAMETER_LOCATION } = require("./constants");
+const _ = require('lodash')
 
 const axiosRequestGenerator = (method, params, hasResponse) => {
   let res =
@@ -154,7 +155,7 @@ function getBody(data) {
   const getValidationPart = (variableName, message) =>
     `
 v.clearContext()
-if (!checkPayload(${variableName})) {
+if (!check${_.upperFirst(variableName)}(${variableName})) {
   console.debug(v.explanation)
   throw new TypeError(${JSON.stringify(message)})
 }
