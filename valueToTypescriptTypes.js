@@ -30,7 +30,6 @@ function getType(value) {
   if (isArray(value)) {
     return 'array';
   }
-  console.log(value, PARAMETER_TYPE.BOOLEAN);
   if (isBoolean(value)) {
     return 'boolean';
   }
@@ -80,7 +79,6 @@ function valueToTypescriptTypes(value, typeName) {
       outerTypes: [],
     };
   }
-  console.log(value, type);
 
   if (type === 'boolean') {
     return {
