@@ -30,6 +30,8 @@ function getSchema(t, propName = 'Response') {
     const enumTypeConstantsName = _.upperFirst(propName);
     return `checkStringListOfValues(${enumTypeConstantsName})`;
   }
+  if (t.type === PARAMETER_TYPE.FILE) return '"string"';
+  if (t.type === PARAMETER_TYPE.BOOLEAN) return '"boolean"';
   if (t.type === PARAMETER_TYPE.OBJECT) return getObjectSchema(t);
   if (t.type === PARAMETER_TYPE.NUMBER) return '"finite"';
   return '"required"';
