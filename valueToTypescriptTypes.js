@@ -132,7 +132,6 @@ function objectToTypescriptDefinition(value, typeName) {
     }
     return outer
   }, [])
-  insplog(propsTypes.achievements)
   return {
     typeName,
     type: 'object',
