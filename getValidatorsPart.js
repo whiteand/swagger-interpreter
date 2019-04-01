@@ -1,6 +1,7 @@
 const tab = require('./tab')
 const { bfs } = require('js-bfs')
 const insplog = require('./insplog')
+const _ = require('lodash')
 const { PARAMETER_TYPE } = require('./constants')
 
 const getArraySchema = t => `v.arrayOf(${getSchema(t.items)})`
@@ -8,20 +9,24 @@ const getArraySchema = t => `v.arrayOf(${getSchema(t.items)})`
 const getObjectSchema = t => {
   const propertiesList = []
   for (let [propName, propType] of Object.entries(t.properties)) {
-    const propSchema = getSchema(propType)
+    const propSchema = getSchema(propType, propName)
     propertiesList.push(`${JSON.stringify(propName)}: ${propSchema}`)
   }
   const propertyPart = propertiesList.join(',\n')
   return `{\n${tab(propertyPart)}\n}`
 }
 
-function getSchema(t) {
+function getSchema(t, propName = 'Response') {
   if (!t.type) return `() => true`
   if (t.type === PARAMETER_TYPE.ARRAY) {
     return getArraySchema(t)
   }
   if (t.type === PARAMETER_TYPE.INTEGER) return `"safe-integer"`
-  if (t.type === PARAMETER_TYPE.STRING) return '["string", "null"]' // TODO: Add enum
+  if (t.type === PARAMETER_TYPE.STRING && !t.enum) return '["string", "null"]' // TODO: Add enum
+  if (t.type === PARAMETER_TYPE.STRING && t.enum) {
+    const enumTypeConstantsName = _.upperFirst(propName)
+    return `checkStringListOfValues(${enumTypeConstantsName})`
+  }
   if (t.type === PARAMETER_TYPE.OBJECT) return getObjectSchema(t)
   if (t.type === PARAMETER_TYPE.NUMBER) return `"finite"`
   return `"required"`
