@@ -1,6 +1,6 @@
 {
   "name": "api-from",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Code generator for generating api modules from swagger.json",
   "main": "index.js",
   "scripts": {
