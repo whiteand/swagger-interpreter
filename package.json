@@ -1,6 +1,6 @@
 {
-  "name": "swagger-interpretator",
-  "version": "0.0.11",
+  "name": "api-from",
+  "version": "0.0.1",
   "description": "Code generator for generating api modules from swagger.json",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,6 @@
     "eslint-plugin-import": "^2.16.0"
   },
   "bin": {
-    "interpret": "./index.js"
+    "api-from": "./index.js"
   }
 }
