@@ -1,6 +1,6 @@
 {
   "name": "api-from",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Code generator for generating api modules from swagger.json",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,6 @@
     "eslint-plugin-import": "^2.16.0"
   },
   "bin": {
-    "api-from": "node ./index.js"
+    "api-from": "./index.js"
   }
 }

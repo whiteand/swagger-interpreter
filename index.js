@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { readFile, writeFile, parseJson } = require('./helpers');
 const getEndpointData = require('./getEndpointData');
 const getImportsPart = require('./imports');
