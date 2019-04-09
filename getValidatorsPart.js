@@ -51,7 +51,7 @@ const getPayloadValidator = (endpointData) => {
 const getResponseValidator = (data) => {
   const res = `const checkResponse = v(${getSchema(
     data.response,
-  )}) // TODO: write this`;
+  )})`;
   return res;
 };
 

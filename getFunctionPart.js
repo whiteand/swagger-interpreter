@@ -6,7 +6,7 @@ const tab = require('./tab');
 
 const axiosRequestGenerator = (method, params, hasResponse) => {
   let res = `${
-    hasResponse ? 'const response = ' : ''
+    hasResponse ? 'const { data: response } = ' : ''
   }await axios.${method.toLowerCase()}`;
   const isSoLong = params.join(', ').length > 40;
   res = isSoLong
@@ -160,7 +160,7 @@ const deserializePart = (data) => {
     listOfEnumPaths.push(getExamplePath(nodePath));
   });
   const comments = `
-// TODO: write deserialization for enum string lists:
+${listOfEnumPaths.length > 0 ? '// TODO: write deserialization for enum string lists:' : ''}
 ${listOfEnumPaths.join(';\n')}
   `.trim();
   return [comments, 'const result = response'].join('\n');
@@ -183,7 +183,7 @@ if (!check${_.upperFirst(variableName)}(${variableName})) {
     doRequestPart(data, hasPayload, hasResponse), // transforms payload to right axios request
     ...(hasResponse
       ? [
-        getValidationPart('response', `Wrong ${data.apiModuleName} payload`),
+        getValidationPart('response', `Wrong ${data.apiModuleName} response`),
         deserializePart(data), // transforms response and saves into result
         `return result as ${data.responseTypeName}`,
       ]
