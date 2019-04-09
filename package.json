@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/whiteand/swagger-interpreter#readme",
   "dependencies": {
-    "explained-quartet": "0.0.5",
+    "explained-quartet": "0.0.6",
     "js-bfs": "^1.0.1",
     "lodash": "^4.17.11",
     "ramda": "^0.26.1"
