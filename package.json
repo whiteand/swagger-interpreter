@@ -1,6 +1,6 @@
 {
   "name": "api-from",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "Code generator for generating api modules from swagger.json",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/whiteand/swagger-interpreter#readme",
   "dependencies": {
-    "explained-quartet": "0.0.6",
+    "explained-quartet": "latest",
     "js-bfs": "^1.0.1",
     "lodash": "^4.17.11",
     "ramda": "^0.26.1"

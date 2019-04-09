@@ -66,11 +66,16 @@ const hasEnumCheck = (endpointData) => {
 };
 
 const getEnumCheckerPart = () => `
-const checkStringListOfValues = (constants, separator = ",") => value =>
-  typeof value === "string" &&
-  value
+const checkStringListOfValues = (constants, separator = ",") => value => {
+  if (value === 0) return true
+  if (typeof value !== 'string') return false
+  const validValues = Object.values(constants)
+  const isValidValue = value => validValues.includes(value)
+  return value
     .split(separator)
-    .every(enumValue => Object.values(constants).includes(enumValue));
+    .every(isValidValue);
+}
+    
 `.trim();
 
 module.exports = (endpointData) => {

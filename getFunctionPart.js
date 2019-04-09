@@ -163,7 +163,7 @@ const deserializePart = (data) => {
 ${listOfEnumPaths.length > 0 ? '// TODO: write deserialization for enum string lists:' : ''}
 ${listOfEnumPaths.join(';\n')}
   `.trim();
-  return [comments, 'const result = response'].join('\n');
+  return comments;
 };
 
 function getBody(data) {
@@ -184,8 +184,8 @@ if (!check${_.upperFirst(variableName)}(${variableName})) {
     ...(hasResponse
       ? [
         getValidationPart('response', `Wrong ${data.apiModuleName} response`),
-        deserializePart(data), // transforms response and saves into result
-        `return result as ${data.responseTypeName}`,
+        deserializePart(data),
+        `return response as ${data.responseTypeName}`,
       ]
       : []),
   ].join('\n\n');
