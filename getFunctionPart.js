@@ -20,7 +20,7 @@ const getAxiosParams = (method, parameters) => {
   let res = ['URL', null, null];
   const configIndex = ['post', 'put', 'patch'].includes(method) ? 2 : 1;
   const headersLens = R.lensPath([configIndex, 'headers']);
-  const queryLens = R.lensPath([configIndex, 'query']);
+  const queryLens = R.lensPath([configIndex, 'params']);
   const bodyLens = R.lensPath(
     ['post', 'put', 'patch'].includes(method) ? [1] : [1, 'data'],
   );
