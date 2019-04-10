@@ -28,7 +28,7 @@ function getSchema(t, propName = 'Response') {
   if (t.type === PARAMETER_TYPE.STRING && !t.enum) return '["string", "null"]'; // TODO: Add enum
   if (t.type === PARAMETER_TYPE.STRING && t.enum) {
     const enumTypeConstantsName = _.upperFirst(propName);
-    return `checkStringListOfValues(${enumTypeConstantsName})`;
+    return `checkEnumResponse(${enumTypeConstantsName})`;
   }
   if (t.type === PARAMETER_TYPE.FILE) return '"string"';
   if (t.type === PARAMETER_TYPE.BOOLEAN) return '"boolean"';
@@ -66,7 +66,7 @@ const hasEnumCheck = (endpointData) => {
 };
 
 const getEnumCheckerPart = () => `
-const checkStringListOfValues = (constants, separator = ",") => value => {
+const checkEnumResponse = (constants, separator = ",") => value => {
   if (value === 0) return true
   if (typeof value !== 'string') return false
   const validValues = Object.values(constants)
