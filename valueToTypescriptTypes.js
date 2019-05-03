@@ -120,7 +120,7 @@ ${tab(body, 1)}
 
 function objectToTypescriptDefinition(value, typeName) {
   const { properties } = value;
-  if (Object.keys(properties).length === 0) {
+  if (!properties || Object.keys(properties).length === 0) {
     return {
       typeName,
       type: 'object',

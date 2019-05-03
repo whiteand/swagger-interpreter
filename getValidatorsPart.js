@@ -8,6 +8,9 @@ const getArraySchema = t => `v.arrayOf(${getSchema(t.items)})`;
 
 const getObjectSchema = (t) => {
   const propertiesList = [];
+  if (!t.properties) {
+    return '"object!"';
+  }
   const entries = Object.entries(t.properties);
   for (let i = 0; i < entries.length; i += 1) {
     const [propName, propType] = entries[i];

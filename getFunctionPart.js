@@ -102,9 +102,11 @@ const getUrlPart = (parameters, url) => {
 };
 
 const getDestructuring = (parameters) => {
+  if (!parameters || parameters.length === 0) return '';
   const parametersNames = parameters
     .filter(p => p.location !== PARAMETER_LOCATION.PATH)
     .map(p => p.name);
+
 
   const isSoLong = parametersNames.length > 40;
 
